@@ -31,7 +31,7 @@ https://persistent.oaistatic.com/codex-app-prod/linux/rpm/latest/chatgpt.x86_64.
 On a Fedora-like system, install `rpm`, `rpm2cpio`, `cpio`, `curl`, and `file`, then run:
 
 ```bash
-./scripts/build-appimage.sh
+bash ./scripts/build-appimage.sh
 ```
 
 The AppImage and its `.zsync` update file are written to `dist/`.
