@@ -46,7 +46,7 @@ APPDIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 export PATH="$APPDIR/usr/bin:$APPDIR/usr/sbin:$PATH"
 export LD_LIBRARY_PATH="$APPDIR/usr/lib64:$APPDIR/usr/lib:$APPDIR/lib64:$APPDIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-for executable in   "$APPDIR/opt/ChatGPT/chatgpt"   "$APPDIR/opt/chatgpt/chatgpt"   "$APPDIR/usr/lib/chatgpt/chatgpt"; do
+for executable in "$APPDIR/opt/ChatGPT/chatgpt" "$APPDIR/opt/chatgpt/chatgpt" "$APPDIR/usr/lib/chatgpt/chatgpt"; do
   if [ -x "$executable" ]; then
     exec "$executable" "$@"
   fi
@@ -67,7 +67,7 @@ desktop_source="$(find "${APPDIR}" -type f -name '*.desktop' -print -quit)"
   exit 1
 }
 cp -- "${desktop_source}" "${APPDIR}/chatgpt.desktop"
-sed -i   -e 's/^Exec=.*/Exec=AppRun %U/'   -e 's/^Icon=.*/Icon=chatgpt/'   "${APPDIR}/chatgpt.desktop"
+sed -i -e 's/^Exec=.*/Exec=AppRun %U/' -e 's/^Icon=.*/Icon=chatgpt/' "${APPDIR}/chatgpt.desktop"
 
 icon_source="$(find "${APPDIR}" -type f \( -iname 'chatgpt.svg' -o -iname 'chatgpt.png' \) -print | head -n 1)"
 [[ -n "${icon_source}" ]] || {
@@ -80,13 +80,16 @@ ln -sfn "chatgpt.${icon_extension}" "${APPDIR}/.DirIcon"
 
 APPIMAGETOOL="${WORK_DIR}/appimagetool-x86_64.AppImage"
 if [[ ! -x "${APPIMAGETOOL}" ]]; then
-  curl --fail --location --retry 3     --output "${APPIMAGETOOL}"     "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+  curl --fail --location --retry 3 --output "${APPIMAGETOOL}" "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
   chmod 0755 "${APPIMAGETOOL}"
 fi
 
 rm -f -- "${OUTPUT}" "${ZSYNC}"
 printf 'Building AppImage with Gear Lever update metadata...\n'
-ARCH=x86_64 VERSION="${VERSION}"   "${APPIMAGETOOL}" --appimage-extract-and-run   -u "${UPDATE_INFO}" "${APPDIR}" "${OUTPUT}"
+(
+  cd "${DIST_DIR}"
+  ARCH=x86_64 VERSION="${VERSION}" "${APPIMAGETOOL}" --appimage-extract-and-run -u "${UPDATE_INFO}" "${APPDIR}" "$(basename "${OUTPUT}")"
+)
 
 [[ -s "${OUTPUT}" ]] || {
   printf 'AppImage build failed.\n' >&2
