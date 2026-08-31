@@ -139,11 +139,14 @@ mkdir -p "${SMOKE_DIR}"
 (
   cd "${SMOKE_DIR}"
   "${OUTPUT}" --appimage-extract AppRun >/dev/null
-  "${OUTPUT}" --appimage-extract usr/bin/chatgpt >/dev/null
   "${OUTPUT}" --appimage-extract usr/lib/chatgpt/ChatGPT >/dev/null
+  "${OUTPUT}" --appimage-extract usr/lib/chatgpt/codex-launcher >/dev/null
+  "${OUTPUT}" --appimage-extract usr/bin/chatgpt >/dev/null
   test -x squashfs-root/AppRun
-  test -L squashfs-root/usr/bin/chatgpt
   test -x squashfs-root/usr/lib/chatgpt/ChatGPT
+  test -x squashfs-root/usr/lib/chatgpt/codex-launcher
+  test -L squashfs-root/usr/bin/chatgpt
+  test -x squashfs-root/usr/bin/chatgpt
 )
 
 sha256sum "${OUTPUT}" "${ZSYNC}" > "${DIST_DIR}/SHA256SUMS"
