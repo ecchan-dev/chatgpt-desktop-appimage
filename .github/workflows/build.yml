@@ -36,7 +36,7 @@ jobs:
       - name: Install build tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes cpio file gnupg rpm rpm2cpio
+          sudo apt-get install --yes binutils cpio file gnupg rpm rpm2cpio
 
       - name: Build and smoke-test AppImage
         run: bash ./scripts/build-appimage.sh
