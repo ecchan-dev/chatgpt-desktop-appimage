@@ -15,7 +15,7 @@ OUTPUT="${DIST_DIR}/ChatGPT-x86_64.AppImage"
 ZSYNC="${OUTPUT}.zsync"
 UPDATE_INFO="gh-releases-zsync|${REPOSITORY%/*}|${REPOSITORY#*/}|latest|$(basename "${ZSYNC}")"
 
-for command_name in awk cpio curl file find gpg rpm rpm2cpio sed sha256sum; do
+for command_name in awk cpio curl file find gpg readelf rpm rpm2cpio sed sha256sum; do
   command -v "${command_name}" >/dev/null 2>&1 || {
     printf 'Missing required command: %s\n' "${command_name}" >&2
     exit 1
@@ -129,8 +129,7 @@ printf 'Building AppImage with Gear Lever update metadata...\n'
 }
 
 printf 'Running structural AppImage smoke tests...\n'
-actual_update_info="$("${OUTPUT}" --appimage-updateinformation)"
-[[ "${actual_update_info}" == "${UPDATE_INFO}" ]] || {
+readelf --string-dump=.upd_info "${OUTPUT}" | grep -F -- "${UPDATE_INFO}" >/dev/null || {
   printf 'Embedded update information mismatch.\n' >&2
   exit 1
 }
