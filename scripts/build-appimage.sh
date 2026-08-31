@@ -70,8 +70,8 @@ APPDIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 export PATH="$APPDIR/usr/bin:$APPDIR/usr/sbin:$PATH"
 export LD_LIBRARY_PATH="$APPDIR/usr/lib64:$APPDIR/usr/lib:$APPDIR/lib64:$APPDIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-if [ -x "$APPDIR/usr/bin/chatgpt" ]; then
-  exec "$APPDIR/usr/bin/chatgpt" "$@"
+if [ -x "$APPDIR/usr/lib/chatgpt/codex-launcher" ]; then
+  exec "$APPDIR/usr/lib/chatgpt/codex-launcher" "$@"
 fi
 
 for executable in "$APPDIR/usr/lib/chatgpt/ChatGPT" "$APPDIR/opt/ChatGPT/chatgpt" "$APPDIR/opt/chatgpt/chatgpt"; do
@@ -141,12 +141,9 @@ mkdir -p "${SMOKE_DIR}"
   "${OUTPUT}" --appimage-extract AppRun >/dev/null
   "${OUTPUT}" --appimage-extract usr/lib/chatgpt/ChatGPT >/dev/null
   "${OUTPUT}" --appimage-extract usr/lib/chatgpt/codex-launcher >/dev/null
-  "${OUTPUT}" --appimage-extract usr/bin/chatgpt >/dev/null
   test -x squashfs-root/AppRun
   test -x squashfs-root/usr/lib/chatgpt/ChatGPT
   test -x squashfs-root/usr/lib/chatgpt/codex-launcher
-  test -L squashfs-root/usr/bin/chatgpt
-  test -x squashfs-root/usr/bin/chatgpt
 )
 
 sha256sum "${OUTPUT}" "${ZSYNC}" > "${DIST_DIR}/SHA256SUMS"
