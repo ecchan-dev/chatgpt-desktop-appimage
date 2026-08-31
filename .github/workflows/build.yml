@@ -24,10 +24,10 @@ jobs:
       - name: Install build tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes cpio file rpm2cpio
+          sudo apt-get install --yes cpio file rpm rpm2cpio
 
       - name: Build AppImage
-        run: ./scripts/build-appimage.sh
+        run: bash ./scripts/build-appimage.sh
 
       - name: Check whether this version exists
         id: release
@@ -48,4 +48,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.release.outputs.version }}
         run: |
-          gh release create "v${VERSION}"             --title "ChatGPT ${VERSION}"             --notes "Unofficial AppImage repackaged from OpenAI's official Linux RPM."             dist/ChatGPT-x86_64.AppImage             dist/ChatGPT-x86_64.AppImage.zsync             dist/SHA256SUMS
+          gh release create "v${VERSION}" --title "ChatGPT ${VERSION}" --notes "Unofficial AppImage repackaged from OpenAI's official Linux RPM." dist/ChatGPT-x86_64.AppImage dist/ChatGPT-x86_64.AppImage.zsync dist/SHA256SUMS
