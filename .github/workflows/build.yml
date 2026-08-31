@@ -1,0 +1,51 @@
+name: Build AppImage
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: chatgpt-appimage-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes cpio file rpm2cpio
+
+      - name: Build AppImage
+        run: ./scripts/build-appimage.sh
+
+      - name: Check whether this version exists
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="$(cat dist/version.txt)"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          if gh release view "v${version}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish release
+        if: steps.release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          gh release create "v${VERSION}"             --title "ChatGPT ${VERSION}"             --notes "Unofficial AppImage repackaged from OpenAI's official Linux RPM."             dist/ChatGPT-x86_64.AppImage             dist/ChatGPT-x86_64.AppImage.zsync             dist/SHA256SUMS
