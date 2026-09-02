@@ -11,6 +11,9 @@ RPM_FILE="${WORK_DIR}/chatgpt.x86_64.rpm"
 KEY_FILE="${ROOT_DIR}/keys/openai-chatgpt.asc"
 EXPECTED_KEY_FINGERPRINT="3BFA0E4AE8B8CC16A2D9BA684A3B4A566C4660E4"
 APPIMAGETOOL_SHA256="a6d71e2b6cd66f8e8d16c37ad164658985e0cf5fcaa950c90a482890cb9d13e0"
+APPIMAGE_RUNTIME_VERSION="20251108"
+APPIMAGE_RUNTIME_SHA256="2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d"
+APPIMAGE_RUNTIME="${WORK_DIR}/runtime-x86_64-${APPIMAGE_RUNTIME_VERSION}"
 OUTPUT="${DIST_DIR}/ChatGPT-x86_64.AppImage"
 ZSYNC="${OUTPUT}.zsync"
 UPDATE_INFO="gh-releases-zsync|${REPOSITORY%/*}|${REPOSITORY#*/}|latest|$(basename "${ZSYNC}")"
@@ -112,11 +115,21 @@ printf '%s  %s\n' "${APPIMAGETOOL_SHA256}" "${APPIMAGETOOL}" | sha256sum --check
 }
 chmod 0755 "${APPIMAGETOOL}"
 
+# Pin the runtime separately: appimagetool otherwise downloads the rolling latest runtime.
+# When updating, review the upstream release and verify its SHA-256 before changing this pin.
+if [[ ! -f "${APPIMAGE_RUNTIME}" ]]; then
+  curl --proto '=https' --tlsv1.2 --fail --location --retry 3 --output "${APPIMAGE_RUNTIME}" "https://github.com/AppImage/type2-runtime/releases/download/${APPIMAGE_RUNTIME_VERSION}/runtime-x86_64"
+fi
+printf '%s  %s\n' "${APPIMAGE_RUNTIME_SHA256}" "${APPIMAGE_RUNTIME}" | sha256sum --check --status || {
+  printf 'AppImage runtime checksum verification failed.\n' >&2
+  exit 1
+}
+
 rm -f -- "${OUTPUT}" "${ZSYNC}"
 printf 'Building AppImage with Gear Lever update metadata...\n'
 (
   cd "${DIST_DIR}"
-  ARCH=x86_64 VERSION="${VERSION}" "${APPIMAGETOOL}" --appimage-extract-and-run -u "${UPDATE_INFO}" "${APPDIR}" "$(basename "${OUTPUT}")"
+  ARCH=x86_64 VERSION="${VERSION}" "${APPIMAGETOOL}" --appimage-extract-and-run --runtime-file "${APPIMAGE_RUNTIME}" -u "${UPDATE_INFO}" "${APPDIR}" "$(basename "${OUTPUT}")"
 )
 
 [[ -s "${OUTPUT}" ]] || {
