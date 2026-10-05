@@ -10,7 +10,7 @@ APPDIR="${WORK_DIR}/ChatGPT.AppDir"
 RPM_FILE="${WORK_DIR}/chatgpt.x86_64.rpm"
 KEY_FILE="${ROOT_DIR}/keys/openai-chatgpt.asc"
 EXPECTED_KEY_FINGERPRINT="3BFA0E4AE8B8CC16A2D9BA684A3B4A566C4660E4"
-APPIMAGETOOL_SHA256="a6d71e2b6cd66f8e8d16c37ad164658985e0cf5fcaa950c90a482890cb9d13e0"
+APPIMAGETOOL_SHA256="ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0"
 APPIMAGE_RUNTIME_VERSION="20251108"
 APPIMAGE_RUNTIME_SHA256="2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d"
 APPIMAGE_RUNTIME="${WORK_DIR}/runtime-x86_64-${APPIMAGE_RUNTIME_VERSION}"
@@ -107,7 +107,7 @@ ln -sfn "chatgpt.${icon_extension}" "${APPDIR}/.DirIcon"
 
 APPIMAGETOOL="${WORK_DIR}/appimagetool-x86_64.AppImage"
 if [[ ! -f "${APPIMAGETOOL}" ]]; then
-  curl --proto '=https' --tlsv1.2 --fail --location --retry 3 --output "${APPIMAGETOOL}" "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+  curl --proto '=https' --tlsv1.2 --fail --location --retry 3 --output "${APPIMAGETOOL}" "https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage"
 fi
 printf '%s  %s\n' "${APPIMAGETOOL_SHA256}" "${APPIMAGETOOL}" | sha256sum --check --status || {
   printf 'appimagetool checksum verification failed.\n' >&2
